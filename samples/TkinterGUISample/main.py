@@ -18,6 +18,7 @@ class ScalperGUI:
         self.access_token = None
         self.account_id = None
 
+
         notebook = ttk.Notebook(root)
         notebook.pack(fill="both", expand=True)
 
@@ -38,7 +39,7 @@ class ScalperGUI:
         strategies = ["safe", "moderate", "aggressive", "trends", "scalping"]
         ttk.Label(frame, text="Strategy:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.strategy_var = tk.StringVar(value=strategies[0])
-        ttk.OptionMenu(frame, self.strategy_var, strategies[0], *strategies).grid(row=1, column=1, padx=5, pady=5)
+
 
         # Profit/loss metrics
         metrics_frame = ttk.LabelFrame(frame, text="Metrics")
@@ -49,7 +50,7 @@ class ScalperGUI:
         ttk.Label(metrics_frame, textvariable=self.pnl_var).pack(anchor="w")
 
         # Log area
-        ttk.Label(frame, text="Activity Log:").grid(row=3, column=0, columnspan=2, sticky="w", padx=5)
+
         self.log = scrolledtext.ScrolledText(frame, width=60, height=10, state="disabled")
         self.log.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
@@ -76,6 +77,7 @@ class ScalperGUI:
         ttk.Label(frame, text="Access Token:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
         self.token_entry = ttk.Entry(frame)
         self.token_entry.grid(row=2, column=1, padx=5, pady=5)
+
 
 
         frame.columnconfigure(1, weight=1)
