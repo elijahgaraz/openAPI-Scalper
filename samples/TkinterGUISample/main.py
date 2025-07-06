@@ -4,11 +4,7 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from ctrader_open_api import Client, TcpProtocol, EndPoints
-from ctrader_open_api.messages.OpenApiMessages_pb2 import (
-    ProtoOAApplicationAuthReq,
-    ProtoOAAccountAuthReq,
-)
-from .strategies import StrategyManager
+
 from twisted.internet import reactor, tksupport
 
 
@@ -21,8 +17,6 @@ class ScalperGUI:
         self.client = None
         self.access_token = None
         self.account_id = None
-        self.host_var = tk.StringVar(value="Demo")
-        self.strategy_manager = None
 
         notebook = ttk.Notebook(root)
         notebook.pack(fill="both", expand=True)
@@ -83,14 +77,6 @@ class ScalperGUI:
         self.token_entry = ttk.Entry(frame)
         self.token_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        ttk.Label(frame, text="Account ID:").grid(row=3, column=0, padx=5, pady=5, sticky="e")
-        self.account_id_entry = ttk.Entry(frame)
-        self.account_id_entry.grid(row=3, column=1, padx=5, pady=5)
-
-        ttk.Label(frame, text="Host:").grid(row=4, column=0, padx=5, pady=5, sticky="e")
-        ttk.OptionMenu(frame, self.host_var, "Demo", "Demo", "Live").grid(row=4, column=1, padx=5, pady=5, sticky="w")
-
-        ttk.Button(frame, text="Connect", command=self.connect).grid(row=5, column=0, columnspan=2, pady=5)
 
         frame.columnconfigure(1, weight=1)
 
@@ -106,32 +92,6 @@ class ScalperGUI:
         client_id = self.client_id_entry.get()
         client_secret = self.client_secret_entry.get()
         self.access_token = self.token_entry.get()
-        self.account_id = self.account_id_entry.get()
-
-        host = EndPoints.PROTOBUF_LIVE_HOST if self.host_var.get() == "Live" else EndPoints.PROTOBUF_DEMO_HOST
-        self.client = Client(host, EndPoints.PROTOBUF_PORT, TcpProtocol)
-
-        def on_connected(_):
-            self.log_message("Connected")
-            app_req = ProtoOAApplicationAuthReq()
-            app_req.clientId = client_id
-            app_req.clientSecret = client_secret
-
-            def on_app_auth(_):
-                self.log_message("Application authorized")
-                if self.account_id and self.access_token:
-                    acct_req = ProtoOAAccountAuthReq()
-                    acct_req.ctidTraderAccountId = int(self.account_id)
-                    acct_req.accessToken = self.access_token
-                    self.client.send(acct_req).addCallbacks(
-                        lambda _: self.log_message("Account authorized"),
-                        lambda f: self.log_message(str(f)),
-                    )
-                    self.strategy_manager = StrategyManager(
-                        self.client, int(self.account_id), self.log_message
-                    )
-
-            self.client.send(app_req).addCallbacks(on_app_auth, lambda f: self.log_message(str(f)))
 
         def on_disconnected(_, reason):
             self.log_message(f"Disconnected: {reason}")
@@ -142,20 +102,12 @@ class ScalperGUI:
         self.client.startService()
 
     def start_scalp(self):
-        if not self.strategy_manager:
-            self.log_message("Not connected")
-            return
-        pair = self.pair_var.get()
-        strategy = self.strategy_var.get()
-        self.log_message(f"Starting scalping {pair} using {strategy} strategy")
-        self.strategy_manager.start(strategy, pair)
+
 
     def stop_scalp(self):
         self.log_message("Stopping trading")
         if self.client:
             self.client.stopService()
-        if self.strategy_manager:
-            self.strategy_manager.stop()
 
 
 if __name__ == "__main__":
