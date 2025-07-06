@@ -4,7 +4,7 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from ctrader_open_api import Client, TcpProtocol, EndPoints
-from .strategies import StrategyManager # Import StrategyManager
+from strategies import StrategyManager # Import StrategyManager
 
 from twisted.internet import reactor, tksupport
 
