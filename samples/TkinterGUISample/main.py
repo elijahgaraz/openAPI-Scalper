@@ -4,7 +4,7 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from ctrader_open_api import Client, TcpProtocol, EndPoints
-from ctrader_open_api.messages.OpenApiMessages_pb2 import ProtoOAApplicationAuthReq
+
 from twisted.internet import reactor, tksupport
 
 
@@ -77,7 +77,6 @@ class ScalperGUI:
         self.token_entry = ttk.Entry(frame)
         self.token_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        ttk.Button(frame, text="Connect", command=self.connect).grid(row=3, column=0, columnspan=2, pady=5)
 
         frame.columnconfigure(1, weight=1)
 
@@ -94,15 +93,6 @@ class ScalperGUI:
         client_secret = self.client_secret_entry.get()
         self.access_token = self.token_entry.get()
 
-        self.client = Client(EndPoints.PROTOBUF_DEMO_HOST, EndPoints.PROTOBUF_PORT, TcpProtocol)
-
-        def on_connected(_):
-            self.log_message("Connected")
-            req = ProtoOAApplicationAuthReq()
-            req.clientId = client_id
-            req.clientSecret = client_secret
-            self.client.send(req).addErrback(lambda f: self.log_message(str(f)))
-
         def on_disconnected(_, reason):
             self.log_message(f"Disconnected: {reason}")
 
@@ -112,8 +102,7 @@ class ScalperGUI:
         self.client.startService()
 
     def start_scalp(self):
-        self.log_message(f"Starting scalping {self.pair_var.get()} using {self.strategy_var.get()} strategy")
-        # Placeholder for real scalping logic
+
 
     def stop_scalp(self):
         self.log_message("Stopping trading")
