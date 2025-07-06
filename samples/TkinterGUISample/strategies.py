@@ -29,7 +29,6 @@ def evaluate_market(pair: str) -> str:
 
 # Individual strategy implementations
 
-
 def safe(client, account_id: int, pair: str, log: Callable[[str], None]):
     direction = evaluate_market(pair)
     req = ProtoOANewOrderReq()
